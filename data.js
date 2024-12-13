@@ -1,24 +1,26 @@
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./database.db');
+const db = new sqlite3.Database('./database2.db');
+const bcrypt = require('bcrypt');
 
-// Create 'accounts' table
 db.run(`
-  CREATE TABLE IF NOT EXISTS accounts (
-    AccountID INTEGER PRIMARY KEY AUTOINCREMENT,
-    Username TEXT NOT NULL UNIQUE,
-    Password TEXT NOT NULL,
-    Email TEXT NOT NULL UNIQUE,
-    FullName TEXT,
-    Role TEXT DEFAULT 'user' CHECK (Role IN ('user', 'admin', 'instructor')),
-    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
-  )
-`, (err) => {
-    if (err) {
-        console.error("Error creating 'accounts' table:", err.message);
-    } else {
-        console.log("'accounts' table created successfully");
-    }
-});
+    CREATE TABLE IF NOT EXISTS accounts (
+      AccountID INTEGER PRIMARY KEY AUTOINCREMENT,
+      Username TEXT NOT NULL UNIQUE,
+      Password TEXT NOT NULL,
+      Email TEXT NOT NULL UNIQUE,
+      FullName TEXT,
+      Role TEXT DEFAULT 'user' CHECK (Role IN ('user', 'admin', 'instructor')),
+      CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `, (err) => {
+      if (err) {
+          console.error("Error creating 'accounts' table:", err.message);
+      } else {
+          console.log("'accounts' table created successfully");
+      }
+  });
+  
+  
 
 // Create 'courses' table
 db.run(`
@@ -77,11 +79,19 @@ db.run(`
     }
 });
 
-// Close database connection
-db.close((err) => {
-    if (err) {
-        console.error("Error closing database:", err.message);
-    } else {
-        console.log("Database connection closed.");
-    }
+db.run(`
+  CREATE TABLE IF NOT EXISTS cart (
+    CartItemID INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserID INTEGER NOT NULL,
+    ProductID INTEGER NOT NULL,
+    Quantity INTEGER NOT NULL,
+    FOREIGN KEY (UserID) REFERENCES accounts(AccountID),
+    FOREIGN KEY (ProductID) REFERENCES shop(ProductID)
+  )
+`, (err) => {
+  if (err) {
+    console.error("Error creating 'cart' table:", err.message);
+  } else {
+    console.log("'cart' table created successfully");
+  }
 });
