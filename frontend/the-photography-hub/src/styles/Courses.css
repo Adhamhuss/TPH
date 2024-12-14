@@ -7,17 +7,49 @@
 
 /* Courses Container */
 .courses-container {
-  padding: 20px;
-  padding-top: 100px; /* Ensures the content starts below the navbar */
+  padding: 320px;
+  padding-top: 200px; /* Ensures the content starts below the navbar */
   font-family: 'Arial', sans-serif;
-  background: linear-gradient(to bottom right, #f9f9f9, #e9ecef);
-  min-height: 100vh; /* Ensures the page takes full height */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  background: linear-gradient(to bottom, #000000, #0000ff, #00000000);
+  min-height: 80vh; /* Ensures the page takes full height */
+  display: block; /* Change from flex to block if content alignment isn't critical */
   width: 100%;
   overflow-x: hidden;
+
+  /* Box Styling */
+  max-width: 80%; /* Limit the container width */
+  margin: auto; /* Center the container horizontally */
+  /* border: 2px solid #1900ff; Red outline for the box */
+  box-shadow: 0 15px 30px rgb(0, 0, 0); /* Adds shadow for depth */
+  background-color: rgba(255, 255, 255, 0); /* Semi-transparent white background */
+  border-radius: 10px; /* Adds rounded corners to the box */
 }
+
+/* Ensure text and child elements inside are visible */
+.courses-container h1, 
+.courses-container p, 
+.courses-container ul, 
+.courses-container li, 
+.courses-container button {
+  color: #ff0000; /* Ensure text inside the container is visible */
+  margin: 10px 0; /* Add spacing between child elements */
+  text-align: center; /* Center-align text for aesthetics */
+}
+
+/* Additional styling for buttons */
+.courses-container button {
+  background-color: #ff0000;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.courses-container button:hover {
+  background-color: #cc0000; /* Darker red for hover effect */
+}
+
 
 /* Filter Container */
 .filter-container {

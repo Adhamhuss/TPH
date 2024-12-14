@@ -1,132 +1,148 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const addCourseBtn = document.getElementById('add-course-btn');
-    const addProductBtn = document.getElementById('add-product-btn');
-  
-    const addCourseBox = document.getElementById('add-course-box');
-    const addProductBox = document.getElementById('add-product-box');
-  
-    const loadingIndicator = document.getElementById('loading');
-    const errorContainer = document.getElementById('error-container');
-  
-    // Hide both form containers initially
-    addCourseBox.style.display = 'none';
-    addProductBox.style.display = 'none';
-  
-    // Show the add course form when button is clicked
-    addCourseBtn.addEventListener('click', function () {
-      addProductBox.style.display = 'none'; // Hide product form
-      addCourseBox.style.display = 'block'; // Show course form
-      errorContainer.textContent = ''; // Clear error messages
-    });
-  
-    // Show the add product form when button is clicked
-    addProductBtn.addEventListener('click', function () {
-      addCourseBox.style.display = 'none'; // Hide course form
-      addProductBox.style.display = 'block'; // Show product form
-      errorContainer.textContent = ''; // Clear error messages
-    });
-  
-    // Handle add course form submission
-    const addCourseForm = document.getElementById('add-course-form');
-    addCourseForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-  
-      const courseName = document.getElementById('course-name').value;
-      const courseDescription = document.getElementById('course-description').value;
-      const courseCredits = document.getElementById('course-credits').value;
-      const coursePrice = document.getElementById('course-price').value;
-  
-      if (!courseName || !courseCredits || !coursePrice) {
-        errorContainer.textContent = 'Please fill in all required fields.';
-        return;
-      }
-  
-      loadingIndicator.style.display = 'block';
-  
-      fetch('http://localhost:3001/courses', {
+import React, { useState, useEffect } from 'react';
+import '../styles/AdminDashboard.css'; // CSS file for styling
+import { getAuthToken } from './authUtils'; // Token handling utility
+
+const AdminDashboard = () => {
+  const [selectedTab, setSelectedTab] = useState('courses');
+  const [courses, setCourses] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
+  useEffect(() => {
+    if (selectedTab === 'courses') fetchCourses();
+    if (selectedTab === 'products') fetchProducts();
+  }, [selectedTab]);
+
+  const fetchCourses = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const response = await fetch('http://localhost:3001/courses', {
+        headers: { Authorization: `Bearer ${getAuthToken()}` },
+      });
+      if (!response.ok) throw new Error('Failed to fetch courses');
+      const data = await response.json();
+      setCourses(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchProducts = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const response = await fetch('http://localhost:3001/shop/products', {
+        headers: { Authorization: `Bearer ${getAuthToken()}` },
+      });
+      if (!response.ok) throw new Error('Failed to fetch products');
+      const data = await response.json();
+      setProducts(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFormSubmit = async (e, type) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const payload = Object.fromEntries(formData.entries());
+    setLoading(true);
+    setError('');
+    setSuccessMessage('');
+
+    try {
+      const url = type === 'course' ? 'http://localhost:3001/courses' : 'http://localhost:3001/shop/products';
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + getAuthToken(),
+          Authorization: `Bearer ${getAuthToken()}`,
         },
-        body: JSON.stringify({
-          courseName,
-          description: courseDescription,
-          credits: courseCredits,
-          price: coursePrice,
-        }),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('Failed to add course');
-          }
-          return response.json();
-        })
-        .then(() => {
-          alert('Course added successfully!');
-          addCourseForm.reset();
-        })
-        .catch((err) => {
-          errorContainer.textContent = err.message;
-        })
-        .finally(() => {
-          loadingIndicator.style.display = 'none';
-        });
-    });
-  
-    // Handle add product form submission
-    const addProductForm = document.getElementById('add-product-form');
-    addProductForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-  
-      const productName = document.getElementById('product-name').value;
-      const productDescription = document.getElementById('product-description').value;
-      const productPrice = document.getElementById('product-price').value;
-      const productStock = document.getElementById('product-stock').value;
-      const productCategory = document.getElementById('product-category').value;
-  
-      if (!productName || !productPrice || !productStock) {
-        errorContainer.textContent = 'Please fill in all required fields.';
-        return;
-      }
-  
-      loadingIndicator.style.display = 'block';
-  
-      fetch('http://localhost:3001/shop', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + getAuthToken(),
-        },
-        body: JSON.stringify({
-          productName,
-          description: productDescription,
-          price: productPrice,
-          stock: productStock,
-          category: productCategory,
-        }),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('Failed to add product');
-          }
-          return response.json();
-        })
-        .then(() => {
-          alert('Product added successfully!');
-          addProductForm.reset();
-        })
-        .catch((err) => {
-          errorContainer.textContent = err.message;
-        })
-        .finally(() => {
-          loadingIndicator.style.display = 'none';
-        });
-    });
-  });
-  
-  // Function to get JWT token for authentication
-  function getAuthToken() {
-    return document.cookie.replace(/(?:(?:^|.*;\s*)authToken\s*=\s*([^;]*).*$)|^.*$/, '$1');
-  }
-  
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) throw new Error(`Failed to add ${type}`);
+      setSuccessMessage(`${type.charAt(0).toUpperCase() + type.slice(1)} added successfully!`);
+      type === 'course' ? fetchCourses() : fetchProducts();
+      e.target.reset();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="dashboard-container">
+      <div className="tabs">
+        <button
+          className={`tab ${selectedTab === 'courses' ? 'active' : ''}`}
+          onClick={() => setSelectedTab('courses')}
+        >
+          Manage Courses
+        </button>
+        <button
+          className={`tab ${selectedTab === 'products' ? 'active' : ''}`}
+          onClick={() => setSelectedTab('products')}
+        >
+          Manage Products
+        </button>
+      </div>
+
+      {error && <div className="error">{error}</div>}
+      {successMessage && <div className="success">{successMessage}</div>}
+      {loading && <div className="loading">Loading...</div>}
+
+      <div className="form-container">
+        {selectedTab === 'courses' ? (
+          <form onSubmit={(e) => handleFormSubmit(e, 'course')}>
+            <h3>Add Course</h3>
+            <input type="text" name="courseName" placeholder="Course Name" required />
+            <textarea name="description" placeholder="Course Description" />
+            <input type="number" name="credits" placeholder="Credits" required />
+            <input type="number" name="price" step="0.01" placeholder="Price" required />
+            <button type="submit">Add Course</button>
+          </form>
+        ) : (
+          <form onSubmit={(e) => handleFormSubmit(e, 'product')}>
+            <h3>Add Product</h3>
+            <input type="text" name="productName" placeholder="Product Name" required />
+            <textarea name="description" placeholder="Product Description" />
+            <input type="number" name="price" step="0.01" placeholder="Price" required />
+            <input type="number" name="stock" placeholder="Stock" required />
+            <input type="text" name="category" placeholder="Category" />
+            <button type="submit">Add Product</button>
+          </form>
+        )}
+      </div>
+
+      <div className="data-container">
+        {selectedTab === 'courses' ? (
+          <ul>
+            {courses.map((course) => (
+              <li key={course.CourseID}>
+                {course.CourseName} - ${course.Price} ({course.Credits} credits)
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <ul>
+            {products.map((product) => (
+              <li key={product.ProductID}>
+                {product.ProductName} - ${product.Price} ({product.Stock} in stock)
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default AdminDashboard;

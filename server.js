@@ -36,20 +36,23 @@ const REFRESH_SECRET_KEY = process.env.REFRESH_SECRET_KEY || 'default_refresh_se
 
 // Token Middleware
 const authenticateToken = (roles = []) => (req, res, next) => {
-  const token = req.cookies.authToken; // Get token from cookies
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Extract the token
+
   if (!token) return res.status(401).send('Access denied. No token provided.');
 
   jwt.verify(token, SECRET_KEY, (err, decoded) => {
     if (err) return res.status(403).send('Invalid or expired token.');
-    req.user = decoded; // Store decoded token (with role and username) in req.user
 
-    // Check if user role matches allowed roles
+    req.user = decoded; // Store the decoded token data (e.g., role) in the request
     if (roles.length && !roles.includes(req.user.role)) {
       return res.status(403).send('Access denied. Insufficient permissions.');
     }
+
     next();
   });
 };
+
 
 // Routes
 app.get('/', (req, res) => res.send('Welcome to The Photography Hub API'));
@@ -84,7 +87,7 @@ app.post('/user/register', async (req, res) => {
         { expiresIn: '1h' }
       );
 
-      res.cookie('authToken', token, { httpOnly: true, secure: false, sameSite: 'Strict' });
+      res.cookie('authToken', token, { httpOnly: true, secure: false, sameSite: 'lax' });
       return res.status(201).send({ message: 'Registration successful.', token });
     });
   } catch (error) {
@@ -110,7 +113,7 @@ app.post('/user/login', (req, res) => {
       { expiresIn: '1h' }
     );
 
-    res.cookie('authToken', token, { httpOnly: true, secure: false, sameSite: 'Strict' });
+    res.cookie('authToken', token, { httpOnly: true, secure: false, sameSite: 'lax' });
     res.status(200).json({ message: 'Login successful.', token });
   });
 });
@@ -124,18 +127,36 @@ app.post('/user/logout', (req, res) => {
 
 // Product Management
 app.get('/shop/products', (req, res) => {
+  console.log('GET /shop/products request received.');
   const query = `SELECT * FROM shop`;
   db.all(query, (err, rows) => {
-    if (err) return res.status(500).send('Error retrieving products.');
+    if (err) {
+      console.error('Database Error:', err.message);
+      return res.status(500).send('Error retrieving products.');
+    }
+    console.log('Products Retrieved:', rows);
     res.status(200).json(rows);
   });
 });
 
+
 app.post('/shop/products', authenticateToken(['admin']), (req, res) => {
   const { productName, description, price, stock, category } = req.body;
+  console.log('Incoming Product Data:', { productName, description, price, stock, category });
+  console.log('Authenticated User:', req.user);
+
+  if (!productName || !price || !stock) {
+    console.error('Missing Required Fields');
+    return res.status(400).send('Missing required fields.');
+  }
+
   const query = `INSERT INTO shop (ProductName, Description, Price, Stock, Category) VALUES (?, ?, ?, ?, ?)`;
   db.run(query, [productName, description, price, stock, category], (err) => {
-    if (err) return res.status(500).send('Error adding product.');
+    if (err) {
+      console.error('Database Error:', err.message);
+      return res.status(500).send('Error adding product.');
+    }
+    console.log('Product Added Successfully');
     res.status(201).send('Product added successfully.');
   });
 });

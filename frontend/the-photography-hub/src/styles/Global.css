@@ -1,0 +1,10 @@
+.app-background {
+    background-image: url('../4k.jpg'); /* Path to your background image */
+    background-size: cover; /* Ensure it covers the entire background */
+    background-position: center; /* Center the image */
+    background-repeat: no-repeat; /* Prevent tiling */
+    height: 100vh; /* Full viewport height */
+    width: 100vw; /* Full viewport width */
+    overflow: auto; /* Allow scrolling if needed */
+  }
+  

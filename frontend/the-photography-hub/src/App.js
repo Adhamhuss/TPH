@@ -6,12 +6,13 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Shop from './components/Shop';
 import InstructorRequests from './components/InstructorRequests';
-import AdminDashboard from './components/AdminDashboard';
+import AdminDashboard from './components/AdminDashboard'
 import Navbar from './components/Navbar';
 import Courses from './components/Courses';
 import Unauthorized from './components/Unauthorized'; // Create a styled Unauthorized component
 import NotFound from './components/NotFound'; // Create a styled NotFound component
 import { jwtDecode } from 'jwt-decode';
+import './styles/Global.css'
 
 // Define roles in a separate utility for consistency
 const ROLES = {
@@ -54,8 +55,8 @@ function App() {
   };
 
   return (
-    <Router>
-      <div>
+    <div className="app-background">
+      <Router>
         <Navbar auth={auth} setAuth={setAuth} />
         <Routes>
           {/* Public Routes */}
@@ -87,9 +88,8 @@ function App() {
           <Route path="/unauthorized" element={<Unauthorized />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </div>
-    </Router>
+      </Router>
+    </div>
   );
 }
-
 export default App;
