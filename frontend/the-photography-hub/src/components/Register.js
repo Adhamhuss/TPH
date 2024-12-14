@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import Cookies from 'js-cookie';
 import '../styles/Register.css';
+import Cookies from 'js-cookie';
+
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -12,33 +13,49 @@ const Register = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [passwordStrength, setPasswordStrength] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+
+    if (name === 'password') {
+      setPasswordStrength(calculateStrength(value));
+    }
+  };
+
+  const calculateStrength = (password) => {
+    if (!password) return '';
+    if (password.length >= 8 && /[A-Z]/.test(password) && /\d/.test(password)) {
+      return 'Strong';
+    }
+    if (password.length >= 6) {
+      return 'Moderate';
+    }
+    return 'Weak';
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+  
     try {
       const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
       const response = await axios.post(`${API_URL}/user/register`, formData);
-      const { token, authLevel } = response.data;
-
+  
+      const { token } = response.data;
+  
       Cookies.set('authToken', token, { expires: 7 });
-      Cookies.set('authLevel', authLevel, { expires: 7 });
-
-      alert('Registration successful! You are now logged in.');
-      window.location.href = '/dashboard';
+      alert('Registration successful!');
+      window.location.href = '/';
     } catch (error) {
-      setError(error.response?.data?.message || 'Registration failed. Please try again.');
+      setError(error.response?.data || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
-
+  
   return (
     <div className="register-container">
       <h2>Sign Up</h2>
@@ -68,6 +85,11 @@ const Register = () => {
           onChange={handleInputChange}
           required
         />
+        {passwordStrength && (
+          <p className={`password-strength ${passwordStrength}`}>
+            Password strength: {passwordStrength}
+          </p>
+        )}
         <select
           name="role"
           value={formData.role}

@@ -1,17 +1,21 @@
-// src/components/Shop.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import '../styles/Shop.css'; // Import the CSS file
 
 function Shop() {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get('http://localhost:8888/shop/products', { withCredentials: true });
         setProducts(response.data);
-      } catch (error) {
-        console.error('Error fetching products:', error);
+        setLoading(false);
+      } catch (err) {
+        setError('Failed to fetch products. Please try again.');
+        setLoading(false);
       }
     };
 
@@ -19,14 +23,16 @@ function Shop() {
   }, []);
 
   return (
-    <div>
+    <div className="shop-container">
       <h1>Shop</h1>
-      <ul>
-        {products.map((product) => (
-          <li key={product.ProductID}>
+      {loading && <p className="loading-message">Loading products...</p>}
+      {error && <p className="error-message">{error}</p>}
+      <ul className="product-list">
+        {!loading && !error && products.map((product) => (
+          <li key={product.ProductID} className="product-card">
             <h3>{product.ProductName}</h3>
             <p>{product.Description}</p>
-            <p>${product.Price}</p>
+            <p className="product-price">${product.Price.toFixed(2)}</p>
           </li>
         ))}
       </ul>
