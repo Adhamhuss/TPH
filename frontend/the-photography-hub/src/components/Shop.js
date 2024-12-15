@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import '../styles/Shop.css'; // Import the CSS file
+import '../styles/Shop.css'; 
 
 function Shop() {
   const [products, setProducts] = useState([]);
@@ -10,7 +10,7 @@ function Shop() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/shop/products', { withCredentials: true });
+        const response = await axios.get('http://localhost:3002/shop/products', { withCredentials: true });
         setProducts(response.data);
         setLoading(false);
       } catch (err) {

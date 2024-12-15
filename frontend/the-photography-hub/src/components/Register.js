@@ -9,7 +9,7 @@ const Register = () => {
     fullName: '',
     email: '',
     password: '',
-    role: 'user', // Default role
+    role: 'user', 
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -41,7 +41,7 @@ const Register = () => {
     setError('');
   
     try {
-      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002';
       const response = await axios.post(`${API_URL}/user/register`, formData);
   
       const { token } = response.data;

@@ -9,12 +9,12 @@ import InstructorRequests from './components/InstructorRequests';
 import AdminDashboard from './components/AdminDashboard'
 import Navbar from './components/Navbar';
 import Courses from './components/Courses';
-import Unauthorized from './components/Unauthorized'; // Create a styled Unauthorized component
-import NotFound from './components/NotFound'; // Create a styled NotFound component
+import Unauthorized from './components/Unauthorized'; 
+import NotFound from './components/NotFound'; 
 import { jwtDecode } from 'jwt-decode';
 import './styles/Global.css'
 
-// Define roles in a separate utility for consistency
+
 const ROLES = {
   ADMIN: 'admin',
   INSTRUCTOR: 'instructor',
@@ -32,7 +32,7 @@ function App() {
         const decoded = jwtDecode(token);
         setAuth({ token, role: decoded.role });
       } catch {
-        Cookies.remove('authToken'); // Clear invalid token
+        Cookies.remove('authToken'); // Clears invalid token
       }
     }
     setLoading(false);
@@ -40,7 +40,7 @@ function App() {
   
   const PrivateRoute = ({ children, roles }) => {
     if (loading) {
-      return <div>Loading...</div>; // Replace with a spinner or splash screen
+      return <div>Loading...</div>; 
     }
 
     if (!auth.token) {

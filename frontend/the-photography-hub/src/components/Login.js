@@ -21,7 +21,7 @@ const Login = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.post('http://localhost:3001/user/login', formData);
+      const response = await axios.post('http://localhost:3002/user/login', formData);
       const { token, authLevel } = response.data;
 
       // Save token and auth level in cookies

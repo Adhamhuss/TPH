@@ -19,7 +19,7 @@
   left: 0;
   z-index: 1000;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease; /* Smooth hide/show */
+  transition: transform 0.3s ease; 
 }
 
 /* Hidden Navbar */
@@ -158,14 +158,14 @@
   }
 }
 
-/* Adjust Page Content Under Navbar */
+
 .page-content {
-  margin-top: 50px; /* Adjusted for thinner navbar */
+  margin-top: 50px; 
 }
 
 /* Responsive Logo */
 @media (max-width: 768px) {
   .logo {
-    width: 80px; /* Adjust size for smaller screens */
+    width: 80px; 
   }
 }

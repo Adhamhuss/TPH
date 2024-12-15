@@ -1,4 +1,4 @@
-// src/utils/authUtils.js
+
 
 /**
  * Retrieves the JWT token from cookies.

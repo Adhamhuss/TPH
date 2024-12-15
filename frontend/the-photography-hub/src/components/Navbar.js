@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {jwtDecode} from 'jwt-decode';
 import Cookies from 'js-cookie';
-import '../styles/Navbar.css'; // Import the CSS file for styling
+import '../styles/Navbar.css'; 
 import logo from '../l.png';
 
 function Navbar() {
@@ -31,7 +31,7 @@ function Navbar() {
   // Handle logout
   const handleLogout = () => {
     Cookies.remove('authToken');
-    Cookies.remove('refreshToken'); // Ensure refresh token is cleared
+    Cookies.remove('refreshToken'); 
     Cookies.remove('username');
     setUserInfo({ username: '', role: '' });
     navigate('/login');
@@ -42,7 +42,7 @@ function Navbar() {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // Navbar hide/show logic with a scroll threshold
+  // Navbar hide/show with a scroll threshold
   useEffect(() => {
     const handleScroll = () => {
       const threshold = 10; // Allow small scroll differences

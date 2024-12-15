@@ -4,19 +4,19 @@ import Cookies from 'js-cookie';
 import '../styles/Home.css';
 
 const Home = () => {
-  const [courses, setCourses] = useState([]); // State to hold the courses data
-  const [loading, setLoading] = useState(true); // Loading state to show while fetching data
-  const [error, setError] = useState(''); // Error state to handle any issues with fetching
+  const [courses, setCourses] = useState([]); 
+  const [loading, setLoading] = useState(true); 
+  const [error, setError] = useState(''); 
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const token = Cookies.get('authToken'); // Fetch token from cookies
-        const response = await axios.get('http://localhost:3001/courses', {
+        const token = Cookies.get('authToken'); // Fetches token from cookies
+        const response = await axios.get('http://localhost:3002/courses', {
           headers: { Authorization: `Bearer ${token}` }, // Include token in request
         });
-        setCourses(response.data); // Set courses state with the fetched data
-        setLoading(false); // Set loading to false when data is fetched
+        setCourses(response.data); 
+        setLoading(false); 
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to load courses. Please try again later.');
         setLoading(false);
@@ -24,7 +24,7 @@ const Home = () => {
     };
 
     fetchCourses();
-  }, []); // Empty dependency array means this effect runs once when the component mounts
+  }, []); 
 
   return (
     <div className="home-container">
@@ -48,9 +48,9 @@ const Home = () => {
       <section className="workshops">
         <h2>Our Workshops</h2>
         {loading ? (
-          <p>Loading courses...</p> // Display loading message while fetching
+          <p>Loading courses...</p> // Displays loading message while fetching
         ) : error ? (
-          <p className="error-message">{error}</p> // Display error message if fetching fails
+          <p className="error-message">{error}</p> // Displays error message if fetching fails
         ) : (
           <div className="workshop-cards">
             {courses.map(course => (

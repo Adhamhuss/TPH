@@ -11,7 +11,7 @@ const Courses = () => {
     // Fetch courses from the server based on the filter
     const fetchCourses = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/courses?filter=${filter}`);
+        const response = await fetch(`http://localhost:3002/courses?filter=${filter}`);
         if (!response.ok) {
           throw new Error('Failed to fetch courses');
         }
