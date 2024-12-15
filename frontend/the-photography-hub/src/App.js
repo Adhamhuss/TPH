@@ -1,0 +1,95 @@
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
+import Home from './components/Home';
+import Login from './components/Login';
+import Register from './components/Register';
+import Shop from './components/Shop';
+import InstructorRequests from './components/InstructorRequests';
+import AdminDashboard from './components/AdminDashboard'
+import Navbar from './components/Navbar';
+import Courses from './components/Courses';
+import Unauthorized from './components/Unauthorized'; 
+import NotFound from './components/NotFound'; 
+import { jwtDecode } from 'jwt-decode';
+import './styles/Global.css'
+
+
+const ROLES = {
+  ADMIN: 'admin',
+  INSTRUCTOR: 'instructor',
+  USER: 'user',
+};
+
+function App() {
+  const [auth, setAuth] = useState({ token: null, role: null });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const token = Cookies.get('authToken');
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setAuth({ token, role: decoded.role });
+      } catch {
+        Cookies.remove('authToken'); // Clears invalid token
+      }
+    }
+    setLoading(false);
+  }, []);
+  
+  const PrivateRoute = ({ children, roles }) => {
+    if (loading) {
+      return <div>Loading...</div>; 
+    }
+
+    if (!auth.token) {
+      return <Navigate to="/login" />;
+    }
+
+    if (roles && !roles.includes(auth.role)) {
+      return <Navigate to="/unauthorized" />;
+    }
+
+    return children;
+  };
+
+  return (
+    <div className="app-background">
+      <Router>
+        <Navbar auth={auth} setAuth={setAuth} />
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/courses" element={<Courses />} />
+
+          {/* Protected Routes */}
+          <Route
+            path="/instructor/request-course"
+            element={
+              <PrivateRoute roles={[ROLES.INSTRUCTOR, ROLES.ADMIN]}>
+                <InstructorRequests />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <PrivateRoute roles={[ROLES.ADMIN]}>
+                <AdminDashboard />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Fallback Routes */}
+          <Route path="/unauthorized" element={<Unauthorized />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Router>
+    </div>
+  );
+}
+export default App;
